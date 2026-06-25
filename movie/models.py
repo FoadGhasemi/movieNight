@@ -1,0 +1,54 @@
+from django.db import models
+from django.conf import settings
+from django.utils.text import slugify
+
+
+class Genre(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def str(self):
+        return self.name
+
+
+class Movie(models.Model):
+    """The 'Master Data' - could eventually be populated via an API like TMDB"""
+    title = models.CharField(max_length=255)
+    release_year = models.IntegerField()
+    description = models.TextField()
+    poster_url = models.URLField(blank=True)  # Link to an image
+    genres = models.ManyToManyField(Genre, related_name='movies')
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        return super(Movie, self).save(*args, **kwargs)
+
+
+class UserMovieEntry(models.Model):
+    """The 'User Interaction' - This is what the user actually tracks"""
+
+    class WatchStatus(models.TextChoices):
+        # These can be translated like _('watched')
+        WATCHED = 'Watched', 'watched'
+        WATCHLIST = 'Watchlist', 'watchlist'
+        DROPPED = 'Dropped', 'dropped'
+
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='entries')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='user_entries')
+
+    status = models.CharField(max_length=10, choices=WatchStatus, default=WatchStatus.WATCHLIST)
+    rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)  # e.g. 8.5
+    review = models.TextField(blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_watched = models.DateField(null=True, blank=True)
+
+    class Meta:
+        # Prevents a user from adding the same movie twice
+        unique_together = ('user', 'movie')
+
+    def str(self):
+        return f"{self.user.username} - {self.movie.title}"
