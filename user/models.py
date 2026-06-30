@@ -6,7 +6,7 @@ from .managers import UserManager
 class User(AbstractBaseUser):
     # Add niche fields here later
     is_premium = models.BooleanField(default=False)
-    username = models.CharField(max_length=20)
+    username = models.CharField(max_length=20, unique=True)
     bio = models.TextField(max_length=500, blank=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     password = models.CharField(max_length=4, unique=True)
@@ -16,8 +16,8 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False, verbose_name="ادمین")
     objects = UserManager()
 
-    USERNAME_FIELD = "password"
-    REQUIRED_FIELDS = ["fullname"]
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["password"]
 
     def __str__(self):
         return self.username

@@ -6,25 +6,27 @@ from django.utils.text import slugify
 class Genre(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
-    def str(self):
+    def __str__(self):
         return self.name
 
 
 class Movie(models.Model):
     """The 'Master Data' - could eventually be populated via an API like TMDB"""
-    title = models.CharField(max_length=255)
+    tmdb_id = models.PositiveIntegerField(unique=True)
+    title = models.CharField(max_length=255, blank=False)
     release_year = models.IntegerField()
     description = models.TextField()
     poster_url = models.URLField(blank=True)  # Link to an image
     genres = models.ManyToManyField(Genre, related_name='movies')
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(null=False, unique=True, blank=True)
 
     def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        return super(Movie, self).save(*args, **kwargs)
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class UserMovieEntry(models.Model):
@@ -50,5 +52,5 @@ class UserMovieEntry(models.Model):
         # Prevents a user from adding the same movie twice
         unique_together = ('user', 'movie')
 
-    def str(self):
+    def __str__(self):
         return f"{self.user.username} - {self.movie.title}"
