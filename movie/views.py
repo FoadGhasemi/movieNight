@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView, DetailView, UpdateView
 from .models import UserMovieEntry, Movie
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -63,5 +63,21 @@ class MyMoviesListView(ListView):
         return context"""
 
 
-class MoviesDetailView(ListView):
+class MoviesDetailView(DetailView):
+    model = Movie
+    template_name = 'movie/movie_detail.html'
+    context_object_name = 'movie'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Check if the current user has an entry for this movie
+        if self.request.user.is_authenticated:
+            context['user_entry'] = UserMovieEntry.objects.filter(
+                user=self.request.user,
+                movie=self.object
+            ).first()
+        return context
+
+
+class EntryUpdateView(UpdateView):
     pass
