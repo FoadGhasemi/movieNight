@@ -33,7 +33,7 @@
                     <p class="card-text">{{ entry.date_added }}</p>
                     <div class="mt-auto">
                         <a
-                                href="{% url 'movie:detail' entry.id %}"
+                                href="{% url 'movie:detail' entry.movie.slug %}"
                                 class="btn btn-gradient create-petition-btn btn-sm"
                         >
                             View Petition

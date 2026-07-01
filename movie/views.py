@@ -67,6 +67,7 @@ class MoviesDetailView(DetailView):
     model = Movie
     template_name = 'movie/movie_detail.html'
     context_object_name = 'movie'
+    slug_url_kwarg = 'movie_slug'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
