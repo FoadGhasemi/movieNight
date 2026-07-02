@@ -2,6 +2,8 @@
 <html>
 {% load static %}
 <head>
+    {% block extra_head %}
+    {% endblock %}
     <title>{{ template_data.title }}</title>
 
     <link

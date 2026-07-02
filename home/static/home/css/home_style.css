@@ -1,0 +1,42 @@
+
+.trend-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.trend-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.trend-card img {
+  transition: transform 0.25s ease;
+}
+.trend-card:hover img {
+  transform: scale(1.06);
+}
+/* keep trending grid centered and fixed tile widths */
+.trending-fixed {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+.trending-header {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 60px 0 40px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.see-all-link {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ff4d6d;
+  text-decoration: underline;
+  margin-right: 15px;
+  transition: color 0.2s ease;
+}
+.see-all-link:hover {
+  color: #b5179e;
+}

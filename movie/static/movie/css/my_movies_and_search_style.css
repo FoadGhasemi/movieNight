@@ -1,0 +1,29 @@
+.btn-gradient.create-petition-btn {
+  background: linear-gradient(90deg, #ff6ec4 0%, #7873f5 100%);
+  color: #fff;
+  padding: 0.85rem 2.2rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 14px rgba(120, 115, 245, 0.15);
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+.card .btn-gradient.create-petition-btn {
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(120, 115, 245, 0.1);
+}
+.btn-gradient.create-petition-btn:hover,
+.btn-gradient.create-petition-btn:focus {
+  filter: brightness(1.12);
+  transform: scale(1.045);
+  box-shadow: 0 6px 24px rgba(255, 110, 196, 0.25);
+  text-decoration: none;
+  color: #fff;
+}

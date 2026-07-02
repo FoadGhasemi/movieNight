@@ -57,10 +57,12 @@ class MyMoviesListView(ListView):
     model = UserMovieEntry
     template_name = 'movie/my_movies.html'
 
-    """def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["now"] = timezone.now()
-        return context"""
+    def get_queryset(self, **kwargs):
+        # If the user is not logged in, return an empty list to avoid errors
+        if not self.request.user.is_authenticated:
+            return UserMovieEntry.objects.none()
+
+        return UserMovieEntry.objects.filter(user=self.request.user).select_related('movie')
 
 
 class MoviesDetailView(DetailView):
