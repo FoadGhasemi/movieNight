@@ -8,5 +8,6 @@ urlpatterns = [
     path('search/', views.MovieSearchView.as_view(), name="search"),
     path('detail/<slug:movie_slug>', views.MoviesDetailView.as_view(), name="detail"),
     path('add_entry/', views.add_from_api_view, name="add_from_api"),
-    path('update/<int:pk>', views.EntryUpdateView.as_view(), name="update"),
+    path('update/<slug:entry_slug>', views.EntryUpdateView.as_view(), name="update"),
+    path('delete/<slug:entry_slug>', views.EntryDeleteView.as_view(), name="delete"),
 ]

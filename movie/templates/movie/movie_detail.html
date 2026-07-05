@@ -16,7 +16,8 @@
         <!-- Show their personal tracking info -->
         <h4>Your Status: {{ user_entry.get_status_display }}</h4>
         <p>Rating: {{ user_entry.rating }}/10</p>
-        <a href="{% url 'movie:update' user_entry.pk %}">Edit my entry</a>
+        <a href="{{ user_entry.get_absolute_url }}">Edit my entry</a><br>
+        <a href="{% url 'movie:delete' user_entry.slug %}">Delete my entry</a>
         {% else %}
         <p>description: {{ movie.description }}</p>
         <!-- Show a button to add it -->

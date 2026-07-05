@@ -1,5 +1,9 @@
+from winreg import DeleteValue
+
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, TemplateView, DetailView, UpdateView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import ListView, TemplateView, DetailView, UpdateView, DeleteView
+from .forms import EntryForm
 from .models import UserMovieEntry, Movie
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -83,4 +87,18 @@ class MoviesDetailView(DetailView):
 
 
 class EntryUpdateView(UpdateView):
-    pass
+    model = UserMovieEntry
+    form_class = EntryForm
+    template_name = "movie/entry_update_form.html"
+    slug_url_kwarg = 'entry_slug'
+
+    def get_success_url(self):
+        return reverse('movie:detail', kwargs={'movie_slug': self.object.movie.slug})
+
+
+class EntryDeleteView(DeleteView):
+    model = UserMovieEntry
+    template_name = "movie/entry_confirm_delete.html"
+    slug_url_kwarg = 'entry_slug'
+    success_url = reverse_lazy("movie:my_movies")
+
