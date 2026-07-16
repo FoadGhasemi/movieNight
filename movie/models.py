@@ -20,6 +20,7 @@ class Movie(models.Model):
     poster_url = models.URLField(blank=True)  # Link to an image
     genres = models.ManyToManyField(Genre, related_name='movies')
     slug = models.SlugField(null=False, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
@@ -43,8 +44,8 @@ class UserMovieEntry(models.Model):
         DROPPED = 'Dropped', 'dropped'
 
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='entries')
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='user_entries')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE, related_name='entries')
+    movie = models.ForeignKey(Movie, null=False, on_delete=models.CASCADE, related_name='user_entries')
 
     status = models.CharField(max_length=10, choices=WatchStatus, default=WatchStatus.WATCHLIST)
     rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)  # e.g. 8.5
@@ -52,6 +53,7 @@ class UserMovieEntry(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     date_watched = models.DateField(null=True, blank=True)
     slug = models.SlugField(null=False, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         # Prevents a user from adding the same movie twice

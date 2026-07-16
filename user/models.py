@@ -9,15 +9,14 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=20, unique=True)
     bio = models.TextField(max_length=500, blank=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    password = models.CharField(max_length=4, unique=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False, verbose_name="ادمین")
     objects = UserManager()
 
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["password"]
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.username

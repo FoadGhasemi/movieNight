@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
-from django.conf.global_settings import STATICFILES_DIRS
+from django.conf.global_settings import STATICFILES_DIRS, LOGIN_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +26,10 @@ SECRET_KEY = 'django-insecure-zm%hujnw4^@xhieo+q8b3&7&8hb#&e2wk)q5!!ufsz1_+@a579
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 ALLOWED_HOSTS = []
 
@@ -44,6 +48,7 @@ INSTALLED_APPS = [
     'user',
     'movie',
     'home',
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -54,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'movieNight.urls'
@@ -80,9 +86,13 @@ WSGI_APPLICATION = 'movieNight.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "movienight",
+        "USER": "postgres",
+        "PASSWORD": "foad1385",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
@@ -124,4 +134,4 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR, 'static']
 
-AUTH_USER_MODEL = "user.User"
+LOGIN_URL = 'user:login'

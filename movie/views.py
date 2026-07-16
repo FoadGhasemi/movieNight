@@ -33,6 +33,9 @@ def add_from_api_view(request):
 
         return redirect('movie:my_movies')
 
+    # When you come from the button this view receives post, unlike when you get redirected from login
+    return redirect('movie:my_movies')
+
 
 class MovieSearchView(ListView):
     model = Movie
@@ -99,6 +102,9 @@ class EntryUpdateView(UpdateView):
 class EntryDeleteView(DeleteView):
     model = UserMovieEntry
     template_name = "movie/entry_confirm_delete.html"
-    slug_url_kwarg = 'entry_slug'
     success_url = reverse_lazy("movie:my_movies")
+    slug_url_kwarg = 'entry_slug'
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('movie')
 

@@ -10,6 +10,7 @@
 <div class="petition-card">
     <div class="petition-surface">
         <h1>{{ movie.title }}</h1>
+        <p>description: {{ movie.description }}</p>
         <img src="{{ movie.poster_url }}" alt="{{ movie.title }}">
 
         {% if user_entry %}
@@ -19,7 +20,6 @@
         <a href="{{ user_entry.get_absolute_url }}">Edit my entry</a><br>
         <a href="{% url 'movie:delete' user_entry.slug %}">Delete my entry</a>
         {% else %}
-        <p>description: {{ movie.description }}</p>
         <!-- Show a button to add it -->
         <div>
             <form method="POST" action="{% url 'movie:add_from_api' %}">
