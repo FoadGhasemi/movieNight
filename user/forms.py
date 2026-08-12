@@ -1,15 +1,20 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
-from .models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
 
-    password1 = forms.CharField(label="گذر واژه", widget=forms.PasswordInput(attrs={"placeholder": "گذرواژه"}))
-    password2 = forms.CharField(label="تایید گذر واژه", widget=forms.PasswordInput(attrs={"placeholder": "تکرار گذرواژه"}))
+    username = forms.CharField(label="نام کاربری", widget=forms.TextInput(attrs={"class": "form-control"}))
+    password1 = forms.CharField(label="گذر واژه", widget=forms.PasswordInput(attrs={"placeholder": "گذرواژه",
+                                                                                    "class": "form-control"}))
+    password2 = forms.CharField(label="تایید گذر واژه", widget=forms.PasswordInput(attrs={"placeholder": "تکرار گذرواژه",
+                                                                                          "class": "form-control"}))
 
     class Meta:
         model = User
@@ -68,3 +73,10 @@ class UserUpdateForm(forms.ModelForm):
         return user
 
 
+class UserLoginForm(forms.Form):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control"})
+    )

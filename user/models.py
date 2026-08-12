@@ -9,7 +9,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=20, unique=True)
     bio = models.TextField(max_length=500, blank=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, blank=True, null=True,)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False, verbose_name="ادمین")

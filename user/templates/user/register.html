@@ -1,39 +1,59 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فرم ثبت نام</title>
-    <link rel="stylesheet" href="{% static 'user/css/register_styles.css' %}">
-</head>
-<body>
-<video autoplay muted loop class="video-background">
-    <source src="{% static 'user/videos/back.mp4' %}" type="video/mp4">
-</video>
-<div class="register-container">
-    <h2>ایجاد حساب کاربری</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        <div class="input-group">
-            {{ form.phone.label_tag }}
-            {{ form.phone }}
-            {% for error in form.phone.errors %}
-            <p class="alert alert-danger">
-                {{ error }}
-            </p>
-            {% endfor %}
+{% block extra_head %}
+<link
+        href="{% static 'user/register_style.css' %}"
+        rel="stylesheet"
+>
+{% endblock %}
+{% block content %}
+<div class="p-3 mt-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="signup-card shadow p-3 mb-4">
+                    <div class="signup-surface">
+                        <h2>Sign Up</h2>
+                        <hr/>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.non_field_errors }}
+                            <div class="input-group">
+                                {{ form.username.label_tag }}
+                                {{ form.username }}
+                                {% for error in form.username.errors %}
+                                <p class="alert alert-danger">
+                                    {{ error }}
+                                </p>
+                                {% endfor %}
+                            </div>
+                            <div class="input-group">
+                                {{ form.password1.label_tag }}
+                                {{ form.password1 }}
+                                {% for error in form.password1.errors %}
+                                <p class="alert alert-danger">
+                                    {{ error }}
+                                </p>
+                                {% endfor %}
+                            </div>
+                            <div class="input-group">
+                                {{ form.password2.label_tag }}
+                                {{ form.password2 }}
+                                {% for error in form.password2.errors %}
+                                <p class="alert alert-danger">
+                                    {{ error }}
+                                </p>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" class="register-button btn btn-gradient">sign up</button>
+                            <div class="login-link">
+                                قبلاً ثبت نام کرده‌اید؟ <a href="login.html">وارد شوید</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="terms-conditions">
-            <input type="checkbox" id="terms" required>
-            <label for="terms">با <a href="#">شرایط و قوانین</a> موافقم</label>
-        </div>
-        <button type="submit" class="register-button">دریافت کد</button>
-        <div class="login-link">
-            قبلاً ثبت نام کرده‌اید؟ <a href="login.html">وارد شوید</a>
-        </div>
-    </form>
+    </div>
 </div>
-</body>
-</html>
+{% endblock content %}
