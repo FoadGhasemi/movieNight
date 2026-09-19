@@ -89,6 +89,7 @@ class MoviesDetailView(DetailView):
         return context
 
 
+@login_required
 class EntryUpdateView(UpdateView):
     model = UserMovieEntry
     form_class = EntryForm
@@ -99,6 +100,7 @@ class EntryUpdateView(UpdateView):
         return reverse('movie:detail', kwargs={'movie_slug': self.object.movie.slug})
 
 
+@login_required
 class EntryDeleteView(DeleteView):
     model = UserMovieEntry
     template_name = "movie/entry_confirm_delete.html"
