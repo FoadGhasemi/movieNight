@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
 from .forms import EntryForm
 from .models import UserMovieEntry, Movie
@@ -34,10 +34,22 @@ class MovieSearchView(ListView):
         return context
 
 
-class MyMoviesAPIView(generics.ListCreateAPIView):
+class MyMoviesListView(ListView):
+    model = UserMovieEntry
+    template_name = 'movie/my_movies.html'
+
+    def get_queryset(self, **kwargs):
+        # If the user is not logged in, return an empty list to avoid errors
+        if not self.request.user.is_authenticated:
+            return UserMovieEntry.objects.none()
+
+        return UserMovieEntry.objects.filter(user=self.request.user).select_related('movie')
+
+
+class EntryListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = MovieEntrySerializer
     permission_classes = [IsAuthenticated]
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
     template_name = "movie/my_movies.html"
 
     def get_queryset(self):
@@ -45,15 +57,6 @@ class MyMoviesAPIView(generics.ListCreateAPIView):
             UserMovieEntry.objects
             .filter(user=self.request.user)
             .select_related("movie")
-        )
-
-    def get(self, request, *args, **kwargs):
-        entries = self.get_queryset()
-        serializer = self.get_serializer(entries, many=True)
-
-        return Response(
-            {"entries": serializer.data},
-            template_name=self.template_name,
         )
 
 

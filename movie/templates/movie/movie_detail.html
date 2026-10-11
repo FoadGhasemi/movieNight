@@ -37,40 +37,27 @@
 </div>
 
 <script>
+    const API_ENTRIES_URL = "{% url 'movie:api_entries' %}";
     const MY_MOVIES_URL = "{% url 'movie:my_movies' %}";
     const CSRF_TOKEN = "{{ csrf_token }}";
 
-    document.querySelectorAll(".add-watchlist").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const d = btn.dataset;
-        btn.disabled = true;
-
-        const res = await fetch(MY_MOVIES_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",   // makes DRF pick JSONRenderer
-            "X-CSRFToken": CSRF_TOKEN,
-          },
-          body: JSON.stringify({
-            movie: {
-              tmdb_id: Number(d.tmdbId),
-              title: d.title,
-              release_year: Number(d.releaseYear),
-              poster_url: d.posterUrl,
-            },
-            status: "Watchlist",
-          }),
-        });
-
-        if (res.ok) {
-          window.location.href = MY_MOVIES_URL;
-        } else {
-          btn.disabled = false;
-          console.error(res.status, await res.json());
-        }
-      });
+    // ...inside the click handler:
+    const res = await fetch(API_ENTRIES_URL, {   // was MY_MOVIES_URL
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-CSRFToken": CSRF_TOKEN,
+      },
+      body: JSON.stringify({ /* same payload as before */ }),
     });
+
+    if (res.ok) {
+      window.location.href = MY_MOVIES_URL;   // still redirect to the page
+    } else {
+      btn.disabled = false;
+      console.error(res.status, await res.json());
+    }
 </script>
 
 <script>
