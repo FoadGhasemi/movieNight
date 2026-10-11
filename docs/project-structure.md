@@ -43,3 +43,6 @@
                  │
                  ↓
              Database
+
+- then the serializer gets the data back to HTML page via APIView's JSONRenderer and Js in the HTML page handles it 
+
