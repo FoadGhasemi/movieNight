@@ -1,5 +1,6 @@
 from winreg import DeleteValue
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, UpdateView, DeleteView
@@ -89,8 +90,7 @@ class MoviesDetailView(DetailView):
         return context
 
 
-@login_required
-class EntryUpdateView(UpdateView):
+class EntryUpdateView(LoginRequiredMixin, UpdateView):
     model = UserMovieEntry
     form_class = EntryForm
     template_name = "movie/entry_update_form.html"
@@ -100,8 +100,7 @@ class EntryUpdateView(UpdateView):
         return reverse('movie:detail', kwargs={'movie_slug': self.object.movie.slug})
 
 
-@login_required
-class EntryDeleteView(DeleteView):
+class EntryDeleteView(LoginRequiredMixin, DeleteView):
     model = UserMovieEntry
     template_name = "movie/entry_confirm_delete.html"
     success_url = reverse_lazy("movie:my_movies")
