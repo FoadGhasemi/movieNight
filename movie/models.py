@@ -59,6 +59,9 @@ class UserMovieEntry(models.Model):
         # Prevents a user from adding the same movie twice
         unique_together = ('user', 'movie')
 
+    def __str__(self):
+        return f"{self.user.username} - {self.movie.title}"
+
     def save(self, *args, **kwargs):
             if not self.slug:
                 self.slug = slugify(self.movie)
@@ -67,5 +70,3 @@ class UserMovieEntry(models.Model):
     def get_absolute_url(self):
         return reverse("movie:update", args=[self.slug])
 
-    def __str__(self):
-        return f"{self.user.username} - {self.movie.title}"

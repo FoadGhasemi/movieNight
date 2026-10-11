@@ -1,12 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block extra_head %}
-<link
-        href="{% static 'movie/css/my_movies_and_search_style.css' %}"
-        rel="stylesheet"
->
-{% endblock %}
-{% block content %}
 <div class="container mt-5 mb-5">
     <h2 class="mb-4 text-white">Petitions</h2>
     <p class="mb-4" style="color: lightgray">
@@ -18,20 +12,20 @@
 
 
     <div class="row">
-        {% for entry in object_list %}
+        {% for entry in entries %}
         <div class="col-md-6 col-lg-4 mb-4">
             <div
                     class="card shadow-sm h-100"
                     style="
-          background-color: #111;
-          color: white;
-          border-radius: 2rem;
-          border: 2px solid;
-          border-image-slice: 1;
-          border-width: 2px;
-          border-image-source: linear-gradient(45deg, #ff6ec4, #7873f5);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        "
+              background-color: #111;
+              color: white;
+              border-radius: 2rem;
+              border: 2px solid;
+              border-image-slice: 1;
+              border-width: 2px;
+              border-image-source: linear-gradient(45deg, #ff6ec4, #7873f5);
+              transition: transform 0.3s ease, box-shadow 0.3s ease;
+            "
             >
                 <div class="card-body d-flex flex-column" style="border-radius: 2rem">
                     <h3 class="card-title">{{ entry.movie }}</h3>
@@ -51,9 +45,15 @@
         </div>
         {% empty %}
         <p>No movie yet.</p>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
+{% endblock %}
+{% block content %}
+<link
+        href="{% static 'movie/css/my_movies_and_search_style.css' %}"
+        rel="stylesheet"
+>
 
 <script>
     document.querySelectorAll(".card").forEach((card) => {

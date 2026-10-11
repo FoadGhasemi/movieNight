@@ -12,3 +12,10 @@ class EntryForm(forms.ModelForm):
             "review": forms.Textarea(attrs={"class": "form-control"}),
             "date_watched": forms.DateInput(attrs={"class": "rounded-2"}),
         }
+
+class AddToWatchlistForm(forms.Form):
+    movie_id = forms.IntegerField(widget=forms.HiddenInput())
+    status = forms.CharField(
+        widget=forms.HiddenInput(),
+        initial="WATCHLIST",
+    )

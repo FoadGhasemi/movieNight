@@ -22,20 +22,57 @@
         {% else %}
         <!-- Show a button to add it -->
         <div>
-            <form method="POST" action="{% url 'movie:add_from_api' %}">
-                {% csrf_token %}
-                <input type="hidden" name="tmdb_id" value="{{ movie.id }}">
-                <input type="hidden" name="title" value="{{ movie.title }}">
-                <input type="hidden" name="release_year" value="{{ movie.release_year }}">
-                <input type="hidden" name="poster_url" value="{{ movie.poster_url }}">
-
-                <button class="btn btn-gradient create-petition-btn btn-sm" type="submit">Add to My Movies
-                </button>
+            <button type="button"
+                    class="btn btn-gradient create-petition-btn btn-sm add-watchlist"
+                    data-tmdb-id="{{ movie.tmdb_id }}"
+                    data-title="{{ movie.title }}"
+                    data-release-year="{{ movie.release_year }}"
+                    data-poster-url="{{ movie.poster_url }}">
+                Add to Watchlist
+            </button>
         </div>
         {% endif %}
     </div>
 </div>
 </div>
+
+<script>
+    const MY_MOVIES_URL = "{% url 'movie:my_movies' %}";
+    const CSRF_TOKEN = "{{ csrf_token }}";
+
+    document.querySelectorAll(".add-watchlist").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const d = btn.dataset;
+        btn.disabled = true;
+
+        const res = await fetch(MY_MOVIES_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",   // makes DRF pick JSONRenderer
+            "X-CSRFToken": CSRF_TOKEN,
+          },
+          body: JSON.stringify({
+            movie: {
+              tmdb_id: Number(d.tmdbId),
+              title: d.title,
+              release_year: Number(d.releaseYear),
+              poster_url: d.posterUrl,
+            },
+            status: "Watchlist",
+          }),
+        });
+
+        if (res.ok) {
+          window.location.href = MY_MOVIES_URL;
+        } else {
+          btn.disabled = false;
+          console.error(res.status, await res.json());
+        }
+      });
+    });
+</script>
+
 <script>
     setTimeout(() => {
       const flash = document.getElementById('flash-messages');
