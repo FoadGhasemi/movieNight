@@ -1,14 +1,17 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .forms import EntryForm
 from .models import UserMovieEntry, Movie
 from django.db.models import Q
-from rest_framework import generics
-from .serializers import MovieEntrySerializer
+from rest_framework import generics, status
+from .serializers import MovieEntrySerializer, EntryDetailSerializer
 
 
 class MovieSearchView(ListView):
@@ -58,6 +61,14 @@ class EntryListCreateAPIView(generics.ListCreateAPIView):
             .filter(user=self.request.user)
             .select_related("movie")
         )
+
+
+class EntryDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = EntryDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return UserMovieEntry.objects.filter(user=self.request.user).select_related("movie")
 
 
 class MoviesDetailView(DetailView):

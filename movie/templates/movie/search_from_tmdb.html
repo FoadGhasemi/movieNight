@@ -73,7 +73,7 @@
             const CSRF_TOKEN = "{{ csrf_token }}";
 
             // ...inside the click handler:
-            const res = await fetch(API_ENTRIES_URL, {   // was MY_MOVIES_URL
+            const res = await fetch(API_ENTRIES_URL, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

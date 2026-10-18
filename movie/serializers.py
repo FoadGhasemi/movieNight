@@ -33,3 +33,12 @@ class MovieEntrySerializer(serializers.ModelSerializer):
         )
 
         return entry
+
+
+class EntryDetailSerializer(serializers.ModelSerializer):
+    movie = MovieImportSerializer(read_only=True)
+
+    class Meta:
+        model = UserMovieEntry
+        fields = ("id", "movie", "status", "rating", "review", "date_watched")
+        read_only_fields = ("id",)
