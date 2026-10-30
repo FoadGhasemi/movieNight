@@ -5,7 +5,7 @@ app_name = "movie"
 
 urlpatterns = [
     path("api/entries/", views.EntryListCreateAPIView.as_view(), name="api_entries"),
-    path("api/entries/<int:pk>/", views.EntryDetail.as_view(), name="api_entries"),
+    path("api/entries/<int:pk>/", views.EntryDetail.as_view(), name="api_entries_detail"),
     path('my_movies/', views.MyMoviesListView.as_view(), name="my_movies"),
     path('search/', views.MovieSearchView.as_view(), name="search"),
     path('detail/<slug:movie_slug>', views.MoviesDetailView.as_view(), name="detail"),

@@ -1,16 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer, BrowsableAPIRenderer
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from .forms import EntryForm
 from .models import UserMovieEntry, Movie
 from django.db.models import Q
-from rest_framework import generics, status
+from rest_framework import generics
 from .serializers import MovieEntrySerializer, EntryDetailSerializer
 
 
@@ -49,10 +45,13 @@ class MyMoviesListView(ListView):
         return UserMovieEntry.objects.filter(user=self.request.user).select_related('movie')
 
 
+
 class EntryListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = MovieEntrySerializer
     permission_classes = [IsAuthenticated]
     renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
+
+    # Should be removed
     template_name = "movie/my_movies.html"
 
     def get_queryset(self):
@@ -69,6 +68,7 @@ class EntryDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return UserMovieEntry.objects.filter(user=self.request.user).select_related("movie")
+
 
 
 class MoviesDetailView(DetailView):
@@ -88,7 +88,12 @@ class MoviesDetailView(DetailView):
         return context
 
 
-class EntryUpdateView(LoginRequiredMixin, UpdateView):
+class OwnEntriesMixin(LoginRequiredMixin):
+    """Login required, and only the current user's entries are reachable."""
+    def get_queryset(self):
+        return UserMovieEntry.objects.filter(user=self.request.user).select_related("movie")
+
+class EntryUpdateView(OwnEntriesMixin, UpdateView):
     model = UserMovieEntry
     form_class = EntryForm
     template_name = "movie/entry_update_form.html"
@@ -98,12 +103,8 @@ class EntryUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('movie:detail', kwargs={'movie_slug': self.object.movie.slug})
 
 
-class EntryDeleteView(LoginRequiredMixin, DeleteView):
+class EntryDeleteView(OwnEntriesMixin, DeleteView):
     model = UserMovieEntry
     template_name = "movie/entry_confirm_delete.html"
     success_url = reverse_lazy("movie:my_movies")
     slug_url_kwarg = 'entry_slug'
-
-    def get_queryset(self):
-        return super().get_queryset().select_related('movie')
-
