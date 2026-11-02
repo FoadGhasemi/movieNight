@@ -48,7 +48,7 @@ class UserMovieEntry(models.Model):
     movie = models.ForeignKey(Movie, null=False, on_delete=models.CASCADE, related_name='user_entries')
 
     status = models.CharField(max_length=10, choices=WatchStatus, default=WatchStatus.WATCHLIST)
-    rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)  # e.g. 8.5
+    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)  # e.g. 8.5
     review = models.TextField(blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     date_watched = models.DateField(null=True, blank=True)
@@ -59,13 +59,14 @@ class UserMovieEntry(models.Model):
         # Prevents a user from adding the same movie twice
         unique_together = ('user', 'movie')
 
+    def __str__(self):
+        return f"{self.user.username} - {self.movie.title}"
+
     def save(self, *args, **kwargs):
             if not self.slug:
-                self.slug = slugify(self.movie)
+                self.slug = slugify(f"{self.user_id}-{self.movie.title}-{self.movie.tmdb_id}")
             super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("movie:update", args=[self.slug])
 
-    def __str__(self):
-        return f"{self.user.username} - {self.movie.title}"

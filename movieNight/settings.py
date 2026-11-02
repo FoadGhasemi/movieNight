@@ -44,11 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     # My apps
     'user',
     'movie',
     'home',
     "debug_toolbar",
+
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +138,8 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR, 'static']
 
 LOGIN_URL = 'user:login'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 2
+}

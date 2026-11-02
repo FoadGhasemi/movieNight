@@ -13,3 +13,36 @@
 - update each movie's review in the list
 - delete the movie from the list
 - (full CRUD)
+
+## Add to Watchlist Structure in regard to APIView
+
+            USER INTERFACE
+                 │
+        "Add to Watchlist"
+                 │
+                 ↓
+            JavaScript
+          UI interaction
+                 │
+                 ↓
+             HTTP/JSON
+                 │
+                 ↓
+             DRF API
+        "add this movie"
+                 │
+                 ↓
+            Serializer
+       validate/transform data
+                 │
+                 ↓
+          Domain operation
+                 │
+                 ↓
+           Django Model
+                 │
+                 ↓
+             Database
+
+- then the serializer gets the data back to HTML page via APIView's JSONRenderer and Js in the HTML page handles it 
+

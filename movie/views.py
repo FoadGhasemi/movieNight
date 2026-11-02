@@ -1,41 +1,13 @@
-from winreg import DeleteValue
-
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, TemplateView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from .forms import EntryForm
 from .models import UserMovieEntry, Movie
-from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-
-
-@login_required
-def add_from_api_view(request):
-    if request.method == 'POST':
-        tmdb_id = request.POST.get('tmdb_id')
-
-        # 1. Get or create the local Movie instance
-        movie, created = Movie.objects.get_or_create(
-            tmdb_id=tmdb_id,
-            defaults={
-                'title': request.POST.get('title'),
-                'release_year': request.POST.get('release_year'),
-                'poster_url': request.POST.get('poster_url'),
-            }
-        )
-
-        # 2. Create the UserMovieEntry
-        UserMovieEntry.objects.get_or_create(
-            user=request.user,
-            movie=movie,
-            defaults={'status': 'WATCHLIST'}
-        )
-
-        return redirect('movie:my_movies')
-
-    # When you come from the button this view receives post, unlike when you get redirected from login
-    return redirect('movie:my_movies')
+from rest_framework import generics
+from .serializers import MovieEntrySerializer, EntryDetailSerializer
 
 
 class MovieSearchView(ListView):
@@ -73,6 +45,32 @@ class MyMoviesListView(ListView):
         return UserMovieEntry.objects.filter(user=self.request.user).select_related('movie')
 
 
+
+class EntryListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = MovieEntrySerializer
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
+
+    # Should be removed
+    template_name = "movie/my_movies.html"
+
+    def get_queryset(self):
+        return (
+            UserMovieEntry.objects
+            .filter(user=self.request.user)
+            .select_related("movie")
+        )
+
+
+class EntryDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = EntryDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return UserMovieEntry.objects.filter(user=self.request.user).select_related("movie")
+
+
+
 class MoviesDetailView(DetailView):
     model = Movie
     template_name = 'movie/movie_detail.html'
@@ -90,7 +88,12 @@ class MoviesDetailView(DetailView):
         return context
 
 
-class EntryUpdateView(LoginRequiredMixin, UpdateView):
+class OwnEntriesMixin(LoginRequiredMixin):
+    """Login required, and only the current user's entries are reachable."""
+    def get_queryset(self):
+        return UserMovieEntry.objects.filter(user=self.request.user).select_related("movie")
+
+class EntryUpdateView(OwnEntriesMixin, UpdateView):
     model = UserMovieEntry
     form_class = EntryForm
     template_name = "movie/entry_update_form.html"
@@ -100,12 +103,8 @@ class EntryUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('movie:detail', kwargs={'movie_slug': self.object.movie.slug})
 
 
-class EntryDeleteView(LoginRequiredMixin, DeleteView):
+class EntryDeleteView(OwnEntriesMixin, DeleteView):
     model = UserMovieEntry
     template_name = "movie/entry_confirm_delete.html"
     success_url = reverse_lazy("movie:my_movies")
     slug_url_kwarg = 'entry_slug'
-
-    def get_queryset(self):
-        return super().get_queryset().select_related('movie')
-
