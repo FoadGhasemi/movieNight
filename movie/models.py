@@ -15,8 +15,8 @@ class Movie(models.Model):
     """The 'Master Data' - could eventually be populated via an API like TMDB"""
     tmdb_id = models.PositiveIntegerField(unique=True)
     title = models.CharField(max_length=255, blank=False)
-    release_year = models.IntegerField()
-    description = models.TextField()
+    release_year = models.IntegerField(null=True, blank=True)
+    description = models.TextField(blank=True)
     poster_url = models.URLField(blank=True)  # Link to an image
     genres = models.ManyToManyField(Genre, related_name='movies')
     slug = models.SlugField(null=False, unique=True, blank=True)
@@ -27,7 +27,7 @@ class Movie(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(f"{self.tmdb_id}-{self.title}")[:50]
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -64,7 +64,7 @@ class UserMovieEntry(models.Model):
 
     def save(self, *args, **kwargs):
             if not self.slug:
-                self.slug = slugify(f"{self.user_id}-{self.movie.title}-{self.movie.tmdb_id}")
+                self.slug = f"{self.user_id}-{self.movie_id}"
             super().save(*args, **kwargs)
 
     def get_absolute_url(self):

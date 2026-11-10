@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+from dotenv import load_dotenv
 from django.conf.global_settings import STATICFILES_DIRS, LOGIN_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -143,3 +144,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 2
 }
+
+load_dotenv(BASE_DIR / ".env")
+TMDB_READ_TOKEN = os.environ.get("TMDB_READ_TOKEN", "")

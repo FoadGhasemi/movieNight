@@ -5,7 +5,7 @@ from .models import Movie, UserMovieEntry
 class MovieImportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ("tmdb_id", "title", "release_year", "poster_url", "slug")
+        fields = ("tmdb_id", "title", "release_year", "description", "poster_url", "slug")
         read_only_fields = ("slug",)
         # Without this, DRF adds a UniqueValidator and rejects any movie already in the DB
         extra_kwargs = {"tmdb_id": {"validators": []}}

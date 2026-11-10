@@ -33,75 +33,89 @@
     </form>
     </p>
 
-    {% if q %}
+    {% if error %}
+    <p class="text-danger">{{ error }}</p>
+    {% endif %}
+
     <div class="row">
-        <div class="row">
-            {% for movie in movies %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card movie-card shadow-sm h-100">
-                    <div class="card-body d-flex flex-column">
-                        <h4 class="card-title">{{ movie.title }}</h4>
-                        <p class="card-text mt-3">
-                            <small>Description:</small><br>
-                            {{ movie.description|truncatewords:20 }}
-                        </p>
-                        <div class="mt-auto d-flex flex-column gap-2">
-                            <a href="{{ movie.get_absolute_url }}" class="btn btn-gradient create-petition-btn btn-sm">View
-                                Petition</a>
-                            <button type="button"
-                                    class="btn btn-gradient create-petition-btn btn-sm add-watchlist"
-                                    data-tmdb-id="{{ movie.tmdb_id }}"
-                                    data-title="{{ movie.title }}"
-                                    data-release-year="{{ movie.release_year }}"
-                                    data-poster-url="{{ movie.poster_url }}">
-                                Add to Watchlist
-                            </button>
-                        </div>
-                    </div>
+        {% for movie in movies %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card movie-card shadow-sm h-100">
+                {% if movie.poster_url %}
+                <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }} poster">
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h4 class="card-title">{{ movie.title }}</h4>
+                    <p class="card-text mt-3">{{ movie.description|truncatewords:20 }}</p>
+                    <button type="button"
+                            class="btn btn-gradient create-petition-btn btn-sm add-watchlist mt-auto"
+                            data-tmdb-id="{{ movie.tmdb_id }}"
+                            data-title="{{ movie.title }}"
+                            data-release-year="{{ movie.release_year|default_if_none:'' }}"
+                            data-description="{{ movie.description }}"
+                            data-poster-url="{{ movie.poster_url }}">
+                        Add to Watchlist
+                    </button>
                 </div>
             </div>
-            {% empty %}
-            <p>No movie yet.</p>
-            {% endfor %}
         </div>
-        {% endif %}
+        {% empty %}
+        {% if q and not error %}<p>No movies found for "{{ q }}".</p>{% endif %}
+        {% endfor %}
+    </div>
 
 
-        <script>
-            const API_ENTRIES_URL = "{% url 'movie:api_entries' %}";
-            const MY_MOVIES_URL = "{% url 'movie:my_movies' %}";
-            const CSRF_TOKEN = "{{ csrf_token }}";
+    <script>
+        const API_ENTRIES_URL = "{% url 'movie:api_entries' %}";
+        const MY_MOVIES_URL = "{% url 'movie:my_movies' %}";
+        const CSRF_TOKEN = "{{ csrf_token }}";
 
-            // ...inside the click handler:
-            const res = await fetch(API_ENTRIES_URL, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-CSRFToken": CSRF_TOKEN,
-              },
-              body: JSON.stringify({ /* same payload as before */ }),
+        document.querySelectorAll(".add-watchlist").forEach((button) => {
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                const data = {
+                    movie: {
+                        tmdb_id: Number(button.dataset.tmdbId),
+                        title: button.dataset.title,
+                        release_year: button.dataset.releaseYear ? Number(button.dataset.releaseYear) : null,
+                        description: button.dataset.description,
+                        poster_url: button.dataset.posterUrl,
+                    },
+                    status: "Watchlist",
+                };
+
+                const res = await fetch(API_ENTRIES_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRFToken": CSRF_TOKEN,
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (res.ok) {
+                    window.location.href = MY_MOVIES_URL;
+                } else {
+                    button.disabled = false;
+                    console.error(res.status, await res.json());
+                }
             });
+        });
+    </script>
 
-            if (res.ok) {
-              window.location.href = MY_MOVIES_URL;   // still redirect to the page
-            } else {
-              btn.disabled = false;
-              console.error(res.status, await res.json());
-            }
-        </script>
+    <script>
+        document.querySelectorAll(".card").forEach((card) => {
+          card.addEventListener("mouseenter", () => {
+            card.style.transform = "scale(1.03)";
+            card.style.boxShadow = "0 8px 20px rgba(255, 110, 196, 0.6)";
+          });
+          card.addEventListener("mouseleave", () => {
+            card.style.transform = "scale(1)";
+            card.style.boxShadow = "none";
+          });
+        });
+    </script>
 
-        <script>
-            document.querySelectorAll(".card").forEach((card) => {
-              card.addEventListener("mouseenter", () => {
-                card.style.transform = "scale(1.03)";
-                card.style.boxShadow = "0 8px 20px rgba(255, 110, 196, 0.6)";
-              });
-              card.addEventListener("mouseleave", () => {
-                card.style.transform = "scale(1)";
-                card.style.boxShadow = "none";
-              });
-            });
-        </script>
-
-        {% endblock %}
+    {% endblock %}

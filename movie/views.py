@@ -3,33 +3,32 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from . import services
 from .forms import EntryForm
 from .models import UserMovieEntry, Movie
-from django.db.models import Q
 from rest_framework import generics
 from .serializers import MovieEntrySerializer, EntryDetailSerializer
+import logging
+from django.views.generic import TemplateView
 
 
-class MovieSearchView(ListView):
-    model = Movie
+logger = logging.getLogger(__name__)
+
+
+class MovieSearchView(TemplateView):
     template_name = "movie/search_from_tmdb.html"
-    context_object_name = "movies"
-
-    def get_queryset(self):
-        q = self.request.GET.get("q", "")
-
-        # This aught to be connected to the API
-        if not q:
-            return Movie.objects.none()
-
-        return Movie.objects.filter(
-            Q(title__icontains=q) |
-            Q(description__icontains=q)
-        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["q"] = self.request.GET.get("q", "")
+        q = self.request.GET.get("q", "").strip()
+        context.update({"q": q, "movies": [], "error": None})
+
+        if q:
+            try:
+                context["movies"] = services.search_movies(q)
+            except services.TMDBError:
+                logger.warning("TMDB search failed for %r", q, exc_info=True)
+                context["error"] = "Movie search is unavailable right now. Please try again."
         return context
 
 
@@ -50,9 +49,6 @@ class EntryListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = MovieEntrySerializer
     permission_classes = [IsAuthenticated]
     renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
-
-    # Should be removed
-    template_name = "movie/my_movies.html"
 
     def get_queryset(self):
         return (
