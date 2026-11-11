@@ -9,14 +9,12 @@ and delete movie/tests.py if it exists), then run:
 
     python manage.py test movie
 """
-from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-
 from movie.models import Movie, UserMovieEntry
 
 User = get_user_model()
@@ -168,3 +166,50 @@ class PageViewOwnershipTests(TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertTrue(UserMovieEntry.objects.filter(pk=self.entry.pk).exists())
+
+
+class SlugUniquenessTests(TestCase):
+    """Regression tests for the slug collisions."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.alice = User.objects.create_user(username="alice", password="pass12345")
+        cls.bob = User.objects.create_user(username="bob", password="pass12345")
+        cls.movie = Movie.objects.create(
+            tmdb_id=1, title="Batman", release_year=1989, description="x"
+        )
+
+    def test_two_users_can_have_entries_for_the_same_movie(self):
+        alice_entry = UserMovieEntry.objects.create(user=self.alice, movie=self.movie)
+        bob_entry = UserMovieEntry.objects.create(user=self.bob, movie=self.movie)
+
+        self.assertNotEqual(alice_entry.slug, bob_entry.slug)
+
+    def test_two_movies_with_the_same_title_get_different_slugs(self):
+        remake = Movie.objects.create(
+            tmdb_id=2, title="Batman", release_year=2022, description="y"
+        )
+
+        self.assertNotEqual(self.movie.slug, remake.slug)
+
+
+class SameMovieOwnershipTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.alice = User.objects.create_user(username="alice", password="pass12345")
+        cls.bob = User.objects.create_user(username="bob", password="pass12345")
+        movie = Movie.objects.create(
+            tmdb_id=1, title="Batman", release_year=1989, description="x"
+        )
+        cls.alice_entry = UserMovieEntry.objects.create(user=cls.alice, movie=movie)
+        cls.bob_entry = UserMovieEntry.objects.create(user=cls.bob, movie=movie)
+
+    def test_bob_cannot_open_alices_update_page(self):
+        self.client.force_login(self.bob)
+        res = self.client.get(reverse("movie:update", args=[self.alice_entry.slug]))
+        self.assertEqual(res.status_code, 404)
+
+    def test_bob_can_open_his_own_update_page(self):
+        self.client.force_login(self.bob)
+        res = self.client.get(reverse("movie:update", args=[self.bob_entry.slug]))
+        self.assertEqual(res.status_code, 200)

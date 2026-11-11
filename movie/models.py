@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
@@ -18,7 +19,7 @@ class Movie(models.Model):
     release_year = models.IntegerField(null=True, blank=True)
     description = models.TextField(blank=True)
     poster_url = models.URLField(blank=True)  # Link to an image
-    genres = models.ManyToManyField(Genre, related_name='movies')
+    genres = models.ManyToManyField(Genre, blank=True, related_name='movies')
     slug = models.SlugField(null=False, unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -43,30 +44,31 @@ class UserMovieEntry(models.Model):
         WATCHLIST = 'Watchlist', 'watchlist'
         DROPPED = 'Dropped', 'dropped'
 
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE, related_name='entries')
     movie = models.ForeignKey(Movie, null=False, on_delete=models.CASCADE, related_name='user_entries')
 
     status = models.CharField(max_length=10, choices=WatchStatus, default=WatchStatus.WATCHLIST)
-    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)  # e.g. 8.5
+    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True
+    , validators = [MinValueValidator(0), MaxValueValidator(10)],
+    )
     review = models.TextField(blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     date_watched = models.DateField(null=True, blank=True)
     slug = models.SlugField(null=False, unique=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         # Prevents a user from adding the same movie twice
-        unique_together = ('user', 'movie')
+        constraints = [
+            models.UniqueConstraint(fields=["user", "movie"], name="unique_user_movie"),
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.movie.title}"
 
     def save(self, *args, **kwargs):
-            if not self.slug:
-                self.slug = f"{self.user_id}-{self.movie_id}"
-            super().save(*args, **kwargs)
+        if not self.slug:
+            self.slug = f"{self.user_id}-{self.movie_id}"
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("movie:update", args=[self.slug])
-

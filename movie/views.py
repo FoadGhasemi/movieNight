@@ -7,7 +7,7 @@ from . import services
 from .forms import EntryForm
 from .models import UserMovieEntry, Movie
 from rest_framework import generics
-from .serializers import MovieEntrySerializer, EntryDetailSerializer
+from .serializers import MovieEntrySerializer
 import logging
 from django.views.generic import TemplateView
 
