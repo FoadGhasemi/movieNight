@@ -58,15 +58,6 @@ class EntryListCreateAPIView(generics.ListCreateAPIView):
         )
 
 
-class EntryDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = EntryDetailSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return UserMovieEntry.objects.filter(user=self.request.user).select_related("movie")
-
-
-
 class MoviesDetailView(DetailView):
     model = Movie
     template_name = 'movie/movie_detail.html'

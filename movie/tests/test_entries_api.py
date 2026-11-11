@@ -48,9 +48,6 @@ class EntryAPITestCase(APITestCase):
         # Every test acts as alice unless it switches user.
         self.client.force_authenticate(user=self.alice)
 
-    def detail_url(self, entry):
-        return reverse("movie:api_entries_detail", args=[entry.pk])
-
     def add_entry(self, user, movie=None, **extra):
         """Create an entry straight in the DB (no API involved)."""
         return UserMovieEntry.objects.create(user=user, movie=movie or self.batman, **extra)
@@ -143,46 +140,6 @@ class EntryListCreateTests(EntryAPITestCase):
                 self.assertIn(error_key, res.data)
 
         self.assertEqual(UserMovieEntry.objects.count(), 0)
-
-
-class EntryDetailTests(EntryAPITestCase):
-    def test_other_users_entry_is_404_for_every_method(self):
-        entry = self.add_entry(self.alice)
-        self.client.force_authenticate(user=self.bob)
-        url = self.detail_url(entry)
-
-        responses = (
-            self.client.get(url),
-            self.client.patch(url, {"status": "Dropped"}, format="json"),
-            self.client.delete(url),
-        )
-        for res in responses:
-            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
-
-        entry.refresh_from_db()  # still there, and untouched
-        self.assertEqual(entry.status, "Watchlist")
-
-    def test_patch_updates_only_the_fields_sent(self):
-        entry = self.add_entry(self.alice, review="Great")
-
-        res = self.client.patch(
-            self.detail_url(entry), {"status": "Watched", "rating": "8.5"}, format="json"
-        )
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK, res.data)
-        entry.refresh_from_db()
-        self.assertEqual(entry.status, "Watched")
-        self.assertEqual(entry.rating, Decimal("8.5"))
-        self.assertEqual(entry.review, "Great")  # not sent, so untouched
-
-    def test_delete_removes_entry_but_not_the_movie(self):
-        entry = self.add_entry(self.alice)
-
-        res = self.client.delete(self.detail_url(entry))
-
-        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(UserMovieEntry.objects.filter(pk=entry.pk).exists())
-        self.assertTrue(Movie.objects.filter(pk=self.batman.pk).exists())
 
 
 class PageViewOwnershipTests(TestCase):
