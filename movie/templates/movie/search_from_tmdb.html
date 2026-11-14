@@ -49,11 +49,7 @@
                     <p class="card-text mt-3">{{ movie.description|truncatewords:20 }}</p>
                     <button type="button"
                             class="btn btn-gradient create-petition-btn btn-sm add-watchlist mt-auto"
-                            data-tmdb-id="{{ movie.tmdb_id }}"
-                            data-title="{{ movie.title }}"
-                            data-release-year="{{ movie.release_year|default_if_none:'' }}"
-                            data-description="{{ movie.description }}"
-                            data-poster-url="{{ movie.poster_url }}">
+                            data-tmdb-id="{{ movie.tmdb_id }}">
                         Add to Watchlist
                     </button>
                 </div>
@@ -75,13 +71,7 @@
                 button.disabled = true;
 
                 const data = {
-                    movie: {
-                        tmdb_id: Number(button.dataset.tmdbId),
-                        title: button.dataset.title,
-                        release_year: button.dataset.releaseYear ? Number(button.dataset.releaseYear) : null,
-                        description: button.dataset.description,
-                        poster_url: button.dataset.posterUrl,
-                    },
+                    tmdb_id: Number(button.dataset.tmdbId),
                     status: "Watchlist",
                 };
 

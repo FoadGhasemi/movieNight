@@ -7,7 +7,7 @@ from . import services
 from .forms import EntryForm
 from .models import UserMovieEntry, Movie
 from rest_framework import generics
-from .serializers import MovieEntrySerializer
+from .serializers import MovieEntrySerializer, AddEntrySerializer
 import logging
 from django.views.generic import TemplateView
 
@@ -46,16 +46,15 @@ class MyMoviesListView(ListView):
 
 
 class EntryListCreateAPIView(generics.ListCreateAPIView):
-    serializer_class = MovieEntrySerializer
     permission_classes = [IsAuthenticated]
     renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
 
+    def get_serializer_class(self):
+        return AddEntrySerializer if self.request.method == "POST" else MovieEntrySerializer
+
     def get_queryset(self):
-        return (
-            UserMovieEntry.objects
-            .filter(user=self.request.user)
-            .select_related("movie")
-        )
+        return UserMovieEntry.objects.filter(user=self.request.user)
+
 
 
 class MoviesDetailView(DetailView):

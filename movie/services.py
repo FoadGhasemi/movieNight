@@ -3,6 +3,7 @@ from django.conf import settings
 
 TMDB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w342"
+TMDB_MOVIE_URL = "https://api.themoviedb.org/3/movie/{tmdb_id}"
 
 
 class TMDBError(Exception):
@@ -44,3 +45,21 @@ def search_movies(query):
         raise TMDBError(f"TMDB request failed: {exc}") from exc
 
     return [_to_movie_dict(r) for r in response.json().get("results", [])]
+
+
+def get_movie(tmdb_id):
+    """Fetch one movie's details from TMDB; return a dict in our Movie shape."""
+    try:
+        response = requests.get(
+            TMDB_MOVIE_URL.format(tmdb_id=tmdb_id),
+            headers={
+                "Authorization": f"Bearer {settings.TMDB_READ_TOKEN}",
+                "accept": "application/json",
+            },
+            timeout=5,
+        )
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        raise TMDBError(f"TMDB request failed: {exc}") from exc
+
+    return _to_movie_dict(response.json())
