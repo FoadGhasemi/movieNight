@@ -9,6 +9,9 @@ TMDB_MOVIE_URL = "https://api.themoviedb.org/3/movie/{tmdb_id}"
 class TMDBError(Exception):
     """TMDB was unreachable or returned an error."""
 
+class TMDBNotFound(TMDBError):
+    """TMDB has no movie with this id."""
+
 
 def _to_movie_dict(result):
     """Convert one TMDB result into our Movie shape."""
@@ -58,6 +61,8 @@ def get_movie(tmdb_id):
             },
             timeout=5,
         )
+        if response.status_code == 404:
+            raise TMDBNotFound(f"TMDB has no movie with id {tmdb_id}")
         response.raise_for_status()
     except requests.RequestException as exc:
         raise TMDBError(f"TMDB request failed: {exc}") from exc

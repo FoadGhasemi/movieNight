@@ -42,6 +42,8 @@ class AddEntrySerializer(serializers.Serializer):
         tmdb_id = validated_data["tmdb_id"]
         try:
             movie = get_or_import_movie(tmdb_id)
+        except services.TMDBNotFound:
+            raise serializers.ValidationError({"tmdb_id": "No movie with this id exists on TMDB."})
         except services.TMDBError as exc:
             logger.warning("TMDB lookup failed for %s", tmdb_id, exc_info=True)
             raise MovieServiceUnavailable() from exc
