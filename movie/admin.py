@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Movie, Genre, UserMovieEntry
+
+from .models import Genre, Movie, UserMovieEntry
 
 
 class MovieAdmin(admin.ModelAdmin):

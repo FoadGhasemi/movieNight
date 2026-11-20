@@ -1,10 +1,11 @@
+import logging
+
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
+
 from . import services
 from .importing import get_or_import_movie
 from .models import Movie, UserMovieEntry
-import logging
-
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+
 from movie.models import Movie
 
 

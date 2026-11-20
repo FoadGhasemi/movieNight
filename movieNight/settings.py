@@ -10,29 +10,25 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
-from django.conf.global_settings import STATICFILES_DIRS, LOGIN_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
+TMDB_READ_TOKEN = os.environ.get("TMDB_READ_TOKEN", "")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zm%hujnw4^@xhieo+q8b3&7&8hb#&e2wk)q5!!ufsz1_+@a579'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ["SECRET_KEY"]
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+ALLOWED_HOSTS = [h for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h]
 
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -145,5 +141,3 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 2
 }
 
-load_dotenv(BASE_DIR / ".env")
-TMDB_READ_TOKEN = os.environ.get("TMDB_READ_TOKEN", "")

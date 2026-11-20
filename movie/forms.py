@@ -1,5 +1,7 @@
 from django import forms
+
 from .models import UserMovieEntry
+
 
 class EntryForm(forms.ModelForm):
     class Meta:

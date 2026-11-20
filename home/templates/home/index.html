@@ -161,7 +161,7 @@
             {% for movie in movies %}
             <!-- Card 1 -->
             <a
-                    href="/movies/"
+                    href="{% url 'movie:detail' movie_slug=movie.slug %}"
                     style="
           width: 260px;
           flex: 0 0 260px;
@@ -179,8 +179,8 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
           "
                 >
-                    {% if movie.image %}
-                    <img src="{{ movie.image.url }}" alt="{{ movie.title }}"
+                    {% if movie.poster_url %}
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}"
                          style="width: 260px; height: 220px; object-fit: cover; display: block;">
                     {% else %}
                     <img src="{% static 'img/Aboutimage.png' %}" alt="Placeholder"
@@ -190,7 +190,7 @@
                     <div style="padding: 12px 12px 14px">
                         <div style="font-weight: 700">{{ movie.title }}</div>
                         <div style="opacity: 0.85; font-size: 13px">
-                            {{ movie.genre_list|join:". " }} • {{ movie.release_date|date:"Y" }}
+                            {{ movie.genre|join:". " }} • {{ movie.release_year|date:"Y" }}
                         </div>
                     </div>
                 </div>

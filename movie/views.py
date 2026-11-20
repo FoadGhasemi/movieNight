@@ -1,16 +1,22 @@
+import logging
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import (
+    DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
+
 from . import services
 from .forms import EntryForm
-from .models import UserMovieEntry, Movie
-from rest_framework import generics
-from .serializers import MovieEntrySerializer, AddEntrySerializer
-import logging
-from django.views.generic import TemplateView
-
+from .models import Movie, UserMovieEntry
+from .serializers import AddEntrySerializer, MovieEntrySerializer
 
 logger = logging.getLogger(__name__)
 

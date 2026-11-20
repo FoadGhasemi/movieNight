@@ -1,14 +1,14 @@
+from unittest.mock import patch
+
+import requests
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from movie.models import Movie, UserMovieEntry
-from unittest.mock import patch
-from movie import services
-from django.test import SimpleTestCase
-import requests
 
+from movie import services
+from movie.models import Movie, UserMovieEntry
 
 User = get_user_model()
 
