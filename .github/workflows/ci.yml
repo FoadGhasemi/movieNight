@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-only-not-a-real-secret
+      DEBUG: "False"
+      ALLOWED_HOSTS: localhost
+      TMDB_READ_TOKEN: fake-token
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"   # use the version you run locally
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pip install ruff
+      - run: ruff check .
+      - run: python manage.py test
