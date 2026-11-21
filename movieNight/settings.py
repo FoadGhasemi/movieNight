@@ -25,6 +25,8 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [h for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h]
 
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "")
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
@@ -90,7 +92,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "movienight",
         "USER": "postgres",
-        "PASSWORD": "foad1385",
+        "PASSWORD": POSTGRES_PASSWORD,
         "HOST": "localhost",
         "PORT": "5432",
     }
