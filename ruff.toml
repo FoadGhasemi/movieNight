@@ -1,1 +1,7 @@
 extend-exclude = ["*/migrations/*"]
+[tool.ruff.lint]
+ignore = [
+    "EXE001",
+    "RUF012",
+    "N999",
+]
