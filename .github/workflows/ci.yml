@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       SECRET_KEY: ci-only-not-a-real-secret
       DEBUG: "False"
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.14.5"
+          python-version: "3.14"
           cache: pip
       - run: pip install -r requirements.txt
       - run: pip install ruff
