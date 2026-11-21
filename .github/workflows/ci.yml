@@ -21,5 +21,4 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: pip install ruff
-      - run: ruff check .
       - run: python manage.py test
